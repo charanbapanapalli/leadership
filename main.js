@@ -1,61 +1,35 @@
-const MODEL_URL = "https://teachablemachine.withgoogle.com/models/axjNffSNy/";
+const URL = "https://teachablemachine.withgoogle.com/models/axjNffSNy/";
 
-    let model;
-    let webcam;
-    let isRunning = false;
+let model, webcam;
 
-    const webcamEl = document.getElementById("webcam");
-    const labelEl = document.getElementById("label");
-    const statusEl = document.getElementById("status");
-    const startBtn = document.getElementById("startBtn");
+async function init() {
+  model = await tmImage.load(URL + "model.json", URL + "metadata.json");
 
-    startBtn.addEventListener("click", init);
+  webcam = new tmImage.Webcam(300, 300, true);
+  await webcam.setup();
+  await webcam.play();
 
-    async function init() {
-      if (isRunning) return;
-      startBtn.disabled = true;
-      statusEl.textContent = "Loading model and requesting camera permission...";
+  document.getElementById("webcam").srcObject = webcam.webcam;
 
-      try {
-        model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
+  window.requestAnimationFrame(loop);
+}
 
-        webcam = new tmImage.Webcam(300, 300, true);
-        await webcam.setup(); // prompts for webcam permission
-        await webcam.play();
+async function loop() {
+  webcam.update();
+  await predict();
+  window.requestAnimationFrame(loop);
+}
 
-        // Teachable Machine webcam has an underlying HTMLVideoElement.
-        // Put that directly into our <video> tag.
-        webcamEl.srcObject = webcam.webcam.srcObject;
+async function predict() {
+  const prediction = await model.predict(webcam.canvas);
 
-        isRunning = true;
-        statusEl.textContent = "Camera started. Detecting...";
-        window.requestAnimationFrame(loop);
-      } catch (error) {
-        console.error(error);
-        labelEl.textContent = "Could not start camera";
-        statusEl.textContent =
-          "Check browser camera permission, use HTTPS or localhost, and ensure no other app is using the camera.";
-        startBtn.disabled = false;
-      }
+  let highest = prediction[0];
+  for (let p of prediction) {
+    if (p.probability > highest.probability) {
+      highest = p;
     }
+  }
 
-    async function loop() {
-      if (!isRunning) return;
-
-      webcam.update();
-      await predict();
-      window.requestAnimationFrame(loop);
-    }
-
-    async function predict() {
-      const prediction = await model.predict(webcam.canvas);
-
-      let highest = prediction[0];
-      for (const p of prediction) {
-        if (p.probability > highest.probability) {
-          highest = p;
-        }
-      }
-
-      labelEl.textContent = `Detected: ${highest.className}`;
-    }
+  document.getElementById("label").innerHTML =
+    "Detected: " + highest.className;
+}
