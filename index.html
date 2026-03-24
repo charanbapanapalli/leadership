@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Trash Detector</title>
+
+  <!-- Link CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- TensorFlow + Teachable Machine -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
+</head>
+
+<body>
+
+  <h1>Smart Trash Detector</h1>
+  <p>Show an item to the camera and the AI will guess!</p>
+
+  <button onclick="init()">Start Camera</button>
+
+  <div>
+    <video id="webcam" width="300" height="300" autoplay></video>
+  </div>
+
+  <div id="label">Waiting...</div>
+
+  <!-- Link JS -->
+  <script src="script.js"></script>
+
+</body>
+</html>
