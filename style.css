@@ -29,3 +29,8 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
+#webcam-container canvas {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}

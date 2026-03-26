@@ -8,8 +8,9 @@ async function init() {
   webcam = new tmImage.Webcam(300, 300, true);
   await webcam.setup();
   await webcam.play();
+  webcam.canvas.style.opacity = 1; 
 
-  document.getElementById("webcam").srcObject = webcam.webcam;
+  document.getElementById("webcam-container").appendChild(webcam.canvas);
 
   window.requestAnimationFrame(loop);
 }
